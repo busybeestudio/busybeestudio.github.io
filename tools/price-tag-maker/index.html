@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Price Tag Maker for Craft Fairs & Markets</title>
+<meta name="description" content="Make printable price tags for your craft fair or market stall in minutes. Free, private, no sign-up. Works in English and Spanish. Print on Letter or A4.">
+<style>
+:root{--navy:#13213f;--gold:#f5c84c;--cream:#fff4d6;--ink:#13213f;--muted:#4a5878;--line:#d9c98f;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--cream);color:var(--ink)}
+header.top{background:var(--navy);color:var(--cream);padding:14px 16px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+header.top .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:0}
+h1{margin:0;font-size:1.35rem;line-height:1.2}
+h1 span{color:var(--gold)}
+.lang{display:inline-flex;border:2px solid var(--gold);border-radius:8px;overflow:hidden}
+.lang button{background:transparent;color:var(--cream);border:0;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;min-height:40px}
+.lang button[aria-pressed=true]{background:var(--gold);color:var(--navy)}
+.intro{padding:16px 0 4px;color:var(--muted)}
+.privacy{background:var(--white);border-left:5px solid var(--gold);padding:8px 12px;margin:8px 0 16px;border-radius:4px;font-size:.92rem}
+main.grid{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:860px){main.grid{grid-template-columns:minmax(0,1fr)}}
+main.grid>*{min-width:0}
+section.card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+h2{margin:0 0 10px;font-size:1.05rem}
+label{display:block;font-weight:600;font-size:.9rem;margin:10px 0 4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:#fff;border:1.5px solid #8a93ab;border-radius:6px;padding:8px;min-height:40px}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid var(--gold);outline-offset:1px;border-color:var(--navy)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{background:var(--navy);color:var(--cream);border:2px solid var(--navy);border-radius:8px;padding:9px 14px;font:inherit;font-weight:700;cursor:pointer;min-height:42px}
+.btn.gold{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.btn.ghost{background:#fff;color:var(--navy);border-color:var(--navy)}
+.btn:hover{filter:brightness(1.08)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.item{display:grid;grid-template-columns:minmax(0,1fr) 84px 64px 42px;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--line);align-items:center}
+.item .nm1{grid-column:1/-1}
+.item .h{font-size:.75rem;font-weight:600;color:var(--muted)}
+.item button.x{min-height:40px;border:1.5px solid #8a93ab;background:#fff;border-radius:6px;cursor:pointer;font-size:1.1rem;color:#8a1c1c}
+.itemhead{display:grid;grid-template-columns:1fr 84px 56px 40px;gap:6px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.hint{font-size:.85rem;color:var(--muted);margin:4px 0 0}
+.pro{background:var(--navy);color:var(--cream);border-radius:10px;padding:16px}
+.pro h2{color:var(--gold)}
+.pro ul{margin:0 0 8px;padding-left:20px}
+.pro a{color:var(--gold)}
+.count{font-weight:700}
+/* sheet */
+.sheetbox{overflow:auto;background:#e8dcb0;border:1px solid var(--line);border-radius:10px;padding:12px}
+#sheet{background:#fff;margin:0 auto;box-shadow:0 2px 8px rgba(0,0,0,.2);display:flex;flex-wrap:wrap;align-content:flex-start;padding:8mm;width:215.9mm;min-height:150mm;transform-origin:top left}
+#sheet.a4{width:210mm}
+.tag{border:.3mm dashed #777;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:2mm;color:var(--tc);background:var(--tb);break-inside:avoid;page-break-inside:avoid}
+.tag.s-sm{width:50mm;height:30mm}.tag.s-md{width:70mm;height:40mm}.tag.s-lg{width:90mm;height:55mm}
+.tag .shop{font-size:2.8mm;letter-spacing:.3mm;text-transform:uppercase;opacity:.85}
+.tag .nm{font-weight:700;line-height:1.15;margin:.8mm 0}
+.tag .pr{font-weight:800;line-height:1}
+.tag .nt{opacity:.85;line-height:1.15}
+.s-sm .nm{font-size:4.2mm}.s-sm .pr{font-size:8mm}.s-sm .nt{font-size:2.8mm}
+.s-md .nm{font-size:5.2mm}.s-md .pr{font-size:11mm}.s-md .nt{font-size:3.4mm}
+.s-lg .nm{font-size:6.6mm}.s-lg .pr{font-size:15mm}.s-lg .nt{font-size:4.2mm}
+.d-plain{--tc:#13213f;--tb:#fff}
+.d-gold{--tc:#13213f;--tb:#f5c84c}
+.d-navy{--tc:#fff4d6;--tb:#13213f}
+.d-border{--tc:#13213f;--tb:#fff;outline:1mm solid #13213f;outline-offset:-2.2mm}
+.hole::before{content:"";position:absolute;top:2mm;left:50%;width:3mm;height:3mm;margin-left:-1.5mm;border:.3mm solid #777;border-radius:50%;background:#fff}
+.hole{padding-top:6mm}
+.empty{width:100%;text-align:center;color:#555;padding:20mm 0}
+footer{background:var(--navy);color:var(--cream);margin-top:24px;padding:18px 0;font-size:.92rem}
+footer a{color:var(--gold)}
+.sr{position:absolute;left:-9999px}
+@media print{
+ @page{margin:0}
+ body{background:#fff}
+ header.top,.intro,.privacy,.editor,.pro,footer,.sheetbox-title,.noprint{display:none!important}
+ main.grid{display:block}.wrap{padding:0;max-width:none}
+ .sheetbox{border:0;padding:0;background:none;overflow:visible}
+ #sheet{box-shadow:none;margin:0;width:auto!important;min-height:0;padding:8mm;transform:none!important}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+<h1><span>&#9679;</span> <span style="color:var(--cream)" data-i="title">Price Tag Maker</span></h1>
+<div class="lang" role="group" aria-label="Language / Idioma">
+<button type="button" id="l-en" aria-pressed="true" lang="en">English</button>
+<button type="button" id="l-es" aria-pressed="false" lang="es">Español</button>
+</div></div></header>
+
+<div class="wrap">
+<p class="intro" data-i="intro"></p>
+<p class="privacy" data-i="privacy"></p>
+<main class="grid">
+<div class="editor">
+<section class="card">
+<h2 data-i="h_setup"></h2>
+<label for="shop" data-i="shop"></label>
+<input id="shop" maxlength="40" autocomplete="off">
+<div class="row2">
+<div><label for="cur" data-i="cur"></label><input id="cur" maxlength="4" value="$" autocomplete="off"></div>
+<div><label for="curpos" data-i="curpos"></label><select id="curpos"><option value="before" data-i="before"></option><option value="after" data-i="after"></option></select></div>
+</div>
+<div class="row2">
+<div><label for="size" data-i="size"></label><select id="size"><option value="sm" data-i="sm"></option><option value="md" data-i="md" selected></option><option value="lg" data-i="lg"></option></select></div>
+<div><label for="paper" data-i="paper"></label><select id="paper"><option value="letter">US Letter</option><option value="a4">A4</option></select></div>
+</div>
+<div class="row2">
+<div><label for="design" data-i="design"></label><select id="design"><option value="plain" data-i="d_plain"></option><option value="gold" data-i="d_gold"></option><option value="navy" data-i="d_navy"></option><option value="border" data-i="d_border"></option></select></div>
+<div><label for="hole" data-i="hole"></label><select id="hole"><option value="0" data-i="no"></option><option value="1" data-i="yes"></option></select></div>
+</div>
+<label><input type="checkbox" id="showshop" checked style="width:auto;min-height:0"> <span data-i="showshop"></span></label>
+</section>
+
+<section class="card">
+<h2 data-i="h_items"></h2>
+<p class="hint" data-i="itemhint"></p>
+<div id="items"></div>
+<div class="btns">
+<button class="btn ghost" type="button" id="add" data-i="add"></button>
+<button class="btn ghost" type="button" id="clear" data-i="clear"></button>
+</div>
+<label for="bulk" data-i="bulk"></label>
+<textarea id="bulk" rows="4" placeholder="Soy candle, 14&#10;Beeswax wrap, 9.50, hand made"></textarea>
+<p class="hint" data-i="bulkhint"></p>
+<div class="btns"><button class="btn ghost" type="button" id="bulkgo" data-i="bulkgo"></button></div>
+</section>
+
+<section class="card">
+<div class="btns" style="margin-top:0">
+<button class="btn gold" type="button" id="print" data-i="print"></button>
+<button class="btn ghost" type="button" id="sample" data-i="sample"></button>
+</div>
+<p class="hint"><span class="count" id="count"></span> <span data-i="printhint"></span></p>
+</section>
+
+<section class="pro" aria-labelledby="prot">
+<h2 id="prot" data-i="pro_h"></h2>
+<ul><li data-i="pro1"></li><li data-i="pro2"></li><li data-i="pro3"></li><li data-i="pro4"></li></ul>
+<p style="margin:0" data-i="pro_note"></p>
+</section>
+</div>
+
+<div>
+<h2 class="sheetbox-title" data-i="preview"></h2>
+<div class="sheetbox" id="box" role="region" aria-label="Preview"><div id="sheet"></div></div>
+</div>
+</main>
+</div>
+
+<footer><div class="wrap">
+<strong>Busy Bee Studio</strong> &middot; <a href="https://busybeestudio.github.io/" data-i="home">More from Busy Bee Studio</a> &middot;
+<span data-i="contact">Contact</span>: <a href="mailto:amirsagentsbehere@gmail.com">amirsagentsbehere@gmail.com</a>
+<div style="margin-top:6px;opacity:.85" data-i="privacy_short"></div>
+</div></footer>
+
+<script>
+(function(){
+var T={
+en:{title:"Price Tag Maker",intro:"Type your products and prices, pick a size, and print cut-ready price tags for your craft fair, farmers market or stall. Works on Letter and A4 paper.",
+privacy:"Everything stays in your browser; nothing is sent anywhere.",privacy_short:"Everything stays in your browser; nothing is sent anywhere.",
+h_setup:"1. Tag style",shop:"Shop name (optional)",cur:"Currency symbol",curpos:"Symbol position",before:"Before price ($5)",after:"After price (5 €)",
+size:"Tag size",sm:"Small (50 x 30 mm)",md:"Medium (70 x 40 mm)",lg:"Large (90 x 55 mm)",paper:"Paper",design:"Design",
+d_plain:"Plain white",d_gold:"Gold",d_navy:"Navy",d_border:"White with frame",hole:"String hole mark",no:"No",yes:"Yes",showshop:"Show shop name on tags",
+h_items:"2. Products",itemhint:"For each product: name, then note, price and number of copies.",c_name:"Name",c_price:"Price",c_qty:"Copies",add:"Add product",clear:"Clear all",
+bulk:"Paste a list",bulkhint:"One product per line: name, price, optional note. Example: Soy candle, 14",bulkgo:"Add pasted lines",
+print:"Print tags",sample:"Load example",printhint:"tags ready. In the print window choose your paper size and set margins to default or none, and scale to 100%.",
+preview:"Preview",name_ph:"Product name",price_ph:"0.00",note_ph:"Note (optional)",remove:"Remove product",
+pro_h:"Pro upgrade (one-time, via Gumroad)",pro1:"Upload your logo onto every tag",pro2:"12 extra designs: holiday, kraft, floral and more",pro3:"Save unlimited price lists and import from CSV",pro4:"Sale tags showing the old and new price",
+pro_note:"Pro is not on sale yet. This free version keeps working as it is.",
+empty:"Add a product to see your tags here.",home:"More from Busy Bee Studio",contact:"Contact",copies_of:"copies of"},
+es:{title:"Creador de etiquetas de precio",intro:"Escribe tus productos y precios, elige un tamaño e imprime etiquetas listas para recortar para tu feria de artesanía, mercadillo o puesto. Funciona con papel Carta y A4.",
+privacy:"Todo se queda en tu navegador; no se envía nada a ningún sitio.",privacy_short:"Todo se queda en tu navegador; no se envía nada a ningún sitio.",
+h_setup:"1. Estilo de etiqueta",shop:"Nombre de tu tienda (opcional)",cur:"Símbolo de moneda",curpos:"Posición del símbolo",before:"Antes del precio ($5)",after:"Después del precio (5 €)",
+size:"Tamaño de etiqueta",sm:"Pequeña (50 x 30 mm)",md:"Mediana (70 x 40 mm)",lg:"Grande (90 x 55 mm)",paper:"Papel",design:"Diseño",
+d_plain:"Blanco liso",d_gold:"Dorado",d_navy:"Azul marino",d_border:"Blanco con marco",hole:"Marca para agujero de cordel",no:"No",yes:"Sí",showshop:"Mostrar el nombre de la tienda en las etiquetas",
+h_items:"2. Productos",itemhint:"Para cada producto: nombre, luego nota, precio y número de copias.",c_name:"Nombre",c_price:"Precio",c_qty:"Copias",add:"Añadir producto",clear:"Borrar todo",
+bulk:"Pegar una lista",bulkhint:"Un producto por línea: nombre, precio, nota opcional. Ejemplo: Vela de soja, 14",bulkgo:"Añadir líneas pegadas",
+print:"Imprimir etiquetas",sample:"Cargar ejemplo",printhint:"etiquetas listas. En la ventana de impresión elige tu tamaño de papel, márgenes predeterminados o ninguno, y escala al 100%.",
+preview:"Vista previa",name_ph:"Nombre del producto",price_ph:"0.00",note_ph:"Nota (opcional)",remove:"Quitar producto",
+pro_h:"Mejora Pro (pago único, en Gumroad)",pro1:"Sube tu logotipo a todas las etiquetas",pro2:"12 diseños extra: fiestas, kraft, flores y más",pro3:"Guarda listas de precios ilimitadas e importa desde CSV",pro4:"Etiquetas de oferta con precio anterior y nuevo",
+pro_note:"Pro todavía no está a la venta. Esta versión gratuita sigue funcionando igual.",
+empty:"Añade un producto para ver tus etiquetas aquí.",home:"Más de Busy Bee Studio",contact:"Contacto",copies_of:"copias de"}
+};
+var lang="en",items=[],MAX=300;
+var $=function(id){return document.getElementById(id)};
+var S={ // saved settings
+ get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},
+ set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+};
+var fields=["shop","cur","curpos","size","paper","design","hole"];
+function t(k){return T[lang][k]||T.en[k]||k}
+function applyLang(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll("[data-i]").forEach(function(el){el.textContent=t(el.getAttribute("data-i"))});
+ $("l-en").setAttribute("aria-pressed",lang==="en");$("l-es").setAttribute("aria-pressed",lang==="es");
+ $("bulk").placeholder=lang==="es"?"Vela de soja, 14\nEnvoltorio de cera, 9.50, hecho a mano":"Soy candle, 14\nBeeswax wrap, 9.50, hand made";
+ document.title=lang==="es"?"Creador gratis de etiquetas de precio para ferias":"Free Price Tag Maker for Craft Fairs & Markets";
+ renderItems();render();
+}
+function save(){S.set("bbs_tags_v1",JSON.stringify({items:items,lang:lang,f:fields.reduce(function(o,k){o[k]=$(k).value;return o},{}),ss:$("showshop").checked}))}
+function load(){
+ var raw=S.get("bbs_tags_v1");if(!raw)return false;
+ try{var d=JSON.parse(raw);if(d.items&&Array.isArray(d.items))items=d.items.slice(0,MAX);
+  if(d.lang==="es"||d.lang==="en")lang=d.lang;
+  if(d.f)fields.forEach(function(k){if(d.f[k]!=null)$(k).value=d.f[k]});
+  if(typeof d.ss==="boolean")$("showshop").checked=d.ss;return true}catch(e){return false}
+}
+function fmt(p){
+ var n=parseFloat(String(p).replace(",","."));
+ var s=isNaN(n)?String(p||""):(Math.round(n)===n&&String(p).indexOf(".")<0&&String(p).indexOf(",")<0?String(n):n.toFixed(2));
+ if(s==="")return"";
+ var c=$("cur").value;
+ return $("curpos").value==="after"?s+" "+c:c+s;
+}
+function renderItems(){
+ var box=$("items");box.innerHTML="";
+ items.forEach(function(it,i){
+  var r=document.createElement("div");r.className="item";
+  r.innerHTML='<div class="nm1"><label class="sr"></label><input type="text" maxlength="40" data-k="name" style="font-weight:600"></div><div><input type="text" maxlength="40" data-k="note"></div>'+
+   '<div><label class="sr"></label><input type="text" inputmode="decimal" maxlength="9" data-k="price"></div>'+
+   '<div><label class="sr"></label><input type="number" min="1" max="60" data-k="qty"></div>'+
+   '<button type="button" class="x">&times;</button>';
+  var ins=r.querySelectorAll("input"),labs=r.querySelectorAll("label");
+  var ids=["nm","pr","qt"];
+  [ins[0],ins[2],ins[3]].forEach(function(inp,j){inp.id="i"+i+ids[j]});
+  ins[1].id="i"+i+"nt";
+  labs[0].htmlFor=ins[0].id;labs[0].textContent=t("c_name")+" "+(i+1);
+  labs[1].htmlFor=ins[2].id;labs[1].textContent=t("c_price")+" "+(i+1);
+  labs[2].htmlFor=ins[3].id;labs[2].textContent=t("c_qty")+" "+(i+1);
+  ins[0].value=it.name||"";ins[0].placeholder=t("name_ph");
+  ins[1].value=it.note||"";ins[1].placeholder=t("note_ph");ins[1].setAttribute("aria-label",t("note_ph")+" "+(i+1));
+  ins[2].value=it.price||"";ins[2].placeholder=t("price_ph");
+  ins[3].value=it.qty||1;ins[2].title=t("c_price");ins[3].title=t("c_qty");ins[2].setAttribute("aria-label",t("c_price")+" "+(i+1));ins[3].setAttribute("aria-label",t("c_qty")+" "+(i+1));
+  var xb=r.querySelector(".x");xb.setAttribute("aria-label",t("remove")+" "+(i+1));
+  r.addEventListener("input",function(e){
+   var k=e.target.getAttribute("data-k");if(!k)return;
+   var v=e.target.value;if(k==="qty"){v=Math.max(1,Math.min(60,parseInt(v,10)||1))}
+   items[i][k]=v;render();save();
+  });
+  xb.onclick=function(){items.splice(i,1);renderItems();render();save();$("add").focus()};
+  box.appendChild(r);
+ });
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function render(){
+ var sheet=$("sheet");sheet.className=$("paper").value==="a4"?"a4":"";
+ var size=$("size").value,design=$("design").value,hole=$("hole").value==="1",shop=$("shop").value.trim(),ss=$("showshop").checked;
+ var html="",n=0;
+ items.forEach(function(it){
+  if(!(it.name||"").trim()&&!String(it.price||"").trim())return;
+  var q=Math.max(1,Math.min(60,parseInt(it.qty,10)||1));
+  for(var k=0;k<q&&n<MAX;k++,n++){
+   html+='<div class="tag s-'+size+' d-'+design+(hole?' hole':'')+'">'+
+    (ss&&shop?'<div class="shop">'+esc(shop)+'</div>':'')+
+    '<div class="nm">'+esc(it.name||"")+'</div>'+
+    '<div class="pr">'+esc(fmt(it.price))+'</div>'+
+    (it.note?'<div class="nt">'+esc(it.note)+'</div>':'')+'</div>';
+  }
+ });
+ sheet.innerHTML=html||'<div class="empty">'+esc(t("empty"))+'</div>';
+ $("count").textContent=n;
+ $("print").disabled=n===0;$("print").style.opacity=n?1:.5;
+ var st=document.getElementById("pagestyle");
+ if(!st){st=document.createElement("style");st.id="pagestyle";document.head.appendChild(st)}
+ st.textContent="@media print{@page{size:"+($("paper").value==="a4"?"A4":"letter")+";margin:0}}";
+ fit();
+}
+function fit(){
+ var box=$("box"),sheet=$("sheet");sheet.style.transform="";sheet.style.marginBottom="";
+ var avail=box.clientWidth-24,w=sheet.offsetWidth;
+ if(w>avail&&avail>0){var s=avail/w;sheet.style.transform="scale("+s+")";sheet.style.marginBottom=(-(sheet.offsetHeight*(1-s)))+"px"}
+}
+function parseBulk(text){
+ var out=[];
+ text.split(/\r?\n/).forEach(function(line){
+  line=line.trim();if(!line)return;
+  var p=line.split(/\s*[,;\t]\s*/);
+  if(p.length<2){out.push({name:p[0].slice(0,40),price:"",note:"",qty:1});return}
+  var note=p.slice(2).join(", ").slice(0,40);
+  out.push({name:p[0].slice(0,40),price:p[1].replace(/[^0-9.,]/g,"").slice(0,9),note:note,qty:1});
+ });
+ return out;
+}
+$("add").onclick=function(){if(items.length>=100)return;items.push({name:"",price:"",note:"",qty:1});renderItems();render();save();
+ var last=$("i"+(items.length-1)+"nm");if(last)last.focus()};
+$("clear").onclick=function(){items=[];renderItems();render();save()};
+$("bulkgo").onclick=function(){items=items.concat(parseBulk($("bulk").value)).slice(0,100);$("bulk").value="";renderItems();render();save()};
+$("sample").onclick=function(){items=lang==="es"?
+ [{name:"Vela de soja",price:"14",note:"Lavanda",qty:2},{name:"Envoltorio de cera",price:"9.50",note:"Hecho a mano",qty:2},{name:"Taza de cerámica",price:"28",note:"",qty:1},{name:"Tarjeta de felicitación",price:"4.5",note:"3 por 12",qty:3}]:
+ [{name:"Soy candle",price:"14",note:"Lavender",qty:2},{name:"Beeswax wrap",price:"9.50",note:"Hand made",qty:2},{name:"Ceramic mug",price:"28",note:"",qty:1},{name:"Greeting card",price:"4.5",note:"3 for 12",qty:3}];
+ renderItems();render();save()};
+$("print").onclick=function(){window.print()};
+fields.forEach(function(k){$(k).addEventListener("input",function(){render();save()})});
+$("showshop").addEventListener("change",function(){render();save()});
+$("l-en").onclick=function(){lang="en";applyLang();save()};
+$("l-es").onclick=function(){lang="es";applyLang();save()};
+window.addEventListener("resize",fit);
+if(!load()){var nl=(navigator.language||"en").toLowerCase();if(nl.indexOf("es")===0)lang="es";items=[{name:"",price:"",note:"",qty:1}]}
+if(!items.length)items=[{name:"",price:"",note:"",qty:1}];
+applyLang();
+})();
+</script>
+</body>
+</html>
