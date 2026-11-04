@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Craft Fair Inventory &amp; Sales Tracker | Busy Bee Studio</title>
+<meta name="description" content="Free craft fair inventory and sales tracker. Tap to record booth sales, see stock left, print a packing list and end-of-day summary. Works offline.">
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1d1a14;--mute:#5c564a;--line:#d9cfb8;--bee:#f5b800;--bee2:#ffe08a;--ok:#1d6b3a;--bad:#a42a1d;--focus:#0b57d0}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:12px 16px 32px}
+h1{font-size:1.4rem;margin:8px 0 2px}
+h2{font-size:1.15rem;margin:0 0 10px}
+p{margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 10px}
+.top{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;justify-content:space-between}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:2px}
+input,select,button{font:inherit;color:inherit}
+input[type=text],input[type=number],input[type=date],select{border:1px solid #8c836c;border-radius:8px;padding:8px 10px;background:#fff;min-height:44px;width:100%}
+button{cursor:pointer;border:1px solid #8c836c;background:#fff;border-radius:10px;padding:8px 14px;min-height:44px}
+button:hover{background:#f6efdc}
+button.primary{background:var(--bee);border-color:#a37a00;font-weight:700}
+button.primary:hover{background:#ffcb2e}
+button.danger{color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+nav.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+nav.tabs button{flex:1 1 auto;font-weight:600}
+nav.tabs button[aria-current=page]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.panel[hidden]{display:none}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--bee2);border-radius:10px;padding:8px 10px}
+.stat b{display:block;font-size:1.35rem}
+.stat span{font-size:.85rem;color:#3d3829}
+.pay{border:0;padding:0;margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pay legend{font-weight:600;padding:0;margin-bottom:4px;float:left;margin-right:10px;line-height:44px}
+.pay label{margin:0;font-weight:700}
+.pay input{position:absolute;opacity:0}
+.pay span{display:inline-block;min-height:44px;line-height:28px;padding:8px 20px;border:2px solid #8c836c;border-radius:10px;background:#fff}
+.pay input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pay input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sell{min-height:96px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;background:var(--bee);border:2px solid #a37a00;border-radius:14px;padding:10px 12px}
+.sell:hover{background:#ffcb2e}
+.sell .n{font-weight:700;overflow-wrap:anywhere}
+.sell .p{font-size:1.2rem;font-weight:800}
+.sell .l{font-size:.85rem}
+.sell.low{background:#ffd9a8}
+.sell:disabled{background:#e4ddcb;border-color:#9d957f;color:#3d3829;opacity:1}
+.undo{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.msg{min-height:1.4em;color:var(--ok);font-weight:600}
+.prow{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--line);padding:10px 0}
+.prow .full{grid-column:1/-1}
+@media(min-width:760px){.prow{grid-template-columns:2fr 1fr 1fr 1fr auto;align-items:end}.prow .full{grid-column:auto}}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.85rem;color:var(--mute)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tfoot td{font-weight:700}
+.box{display:inline-block;width:1.1em;height:1.1em;border:2px solid #000;vertical-align:-3px}
+.printonly{display:none}
+.empty{color:var(--mute)}
+.warn{color:var(--bad);font-weight:600}
+footer{margin-top:20px;color:var(--mute);font-size:.9rem}
+footer a{color:#0a4aa8}
+.small{font-size:.85rem;color:var(--mute)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+@media print{
+ body{background:#fff;font-size:12pt}
+ .wrap{max-width:none;padding:0}
+ .noprint,nav.tabs,.top,footer .tool-link{display:none!important}
+ .panel{display:none!important;border:0;padding:0}
+ body[data-print=packing] #p-packing,body[data-print=summary] #p-summary{display:block!important}
+ .printonly{display:block}
+ button{display:none}
+ th,td{border-bottom:1px solid #888}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top noprint">
+ <div>
+  <h1 id="t-h1"></h1>
+  <p class="sub" id="t-sub"></p>
+ </div>
+ <div class="row">
+  <div style="min-width:180px"><label for="evsel" id="l-event"></label><select id="evsel"></select></div>
+  <button id="langbtn" type="button" aria-label="Language / Idioma"></button>
+ </div>
+</header>
+<nav class="tabs noprint" id="tabs" aria-label="Sections"></nav>
+<div aria-live="polite" class="msg noprint" id="msg" role="status"></div>
+
+<section class="panel" id="p-sell"></section>
+<section class="panel" id="p-products" hidden></section>
+<section class="panel" id="p-restock" hidden></section>
+<section class="panel" id="p-packing" hidden></section>
+<section class="panel" id="p-summary" hidden></section>
+<section class="panel" id="p-events" hidden></section>
+<section class="panel" id="p-data" hidden></section>
+
+<footer>
+ <p id="f-made"></p>
+ <p class="small tool-link"><a id="f-link" href="https://busybeestudio.github.io/tools/price-tag-maker/?utm_source=github&amp;utm_medium=tool&amp;utm_campaign=craft-fair-tracker" rel="noopener"></a></p>
+</footer>
+</div>
+<script>
+(function(){
+"use strict";
+var LINK_TEXT_EN="Need price tags for your booth? Try our free Price Tag Maker";
+var T={
+en:{
+ title:"Craft Fair Inventory & Sales Tracker",
+ sub:"Count your stock, tap to record booth sales, and see your day at a glance. Free, works offline.",
+ event:"Event",lang:"Español",
+ tabs:{sell:"Sell",products:"Products",restock:"Restock",packing:"Packing list",summary:"Summary",events:"Events",data:"Backup"},
+ made:"Made by Busy Bee Studio. Your data stays in this browser.",
+ link:LINK_TEXT_EN,
+ total:"Sales total",items:"Items sold",cash:"Cash",card:"Card",
+ payHow:"Paid by",payCash:"Cash",payCard:"Card",
+ left:"left",soldOut:"Sold out",lowTag:"low",
+ undo:"Undo last sale",nothingUndo:"No sales to undo yet.",lastSale:"Last sale",
+ sold:function(n,p,m){return "Sold: "+n+" ("+p+", "+m+")";},
+ undone:function(n){return "Undone: "+n;},
+ noProducts:"No products yet. Add your first product in the Products tab.",
+ addProduct:"Add a product",pName:"Name",pPrice:"Price",pMade:"Quantity made",pPacked:"Packed for this event",
+ add:"Add product",del:"Delete",delConfirm:function(n){return "Delete \""+n+"\"? Past sales stay in your totals.";},
+ currency:"Currency symbol",
+ invalid:"Please enter a name and a price of 0 or more.",
+ added:function(n){return "Added: "+n;},
+ lowLabel:"Low-stock number (restock when this many or fewer are left)",
+ restockH:"Restock list",restockNone:"Nothing to restock. Everything is above the low-stock number.",
+ colItem:"Item",colLeft:"Left",colPacked:"Packed",colSold:"Sold",colRev:"Revenue",colPrice:"Price",colPack:"Packed?",
+ atHome:"At home",
+ packH:"Packing list",packNote:"Tick each item as it goes into the box.",print:"Print",
+ sumH:"End-of-day summary",printSum:"Print summary",
+ cashTotal:"Cash total",cardTotal:"Card total",salesCount:"Sales recorded",
+ evH:"Events",evName:"Event name",evDate:"Date",evAdd:"Add event",evSave:"Save changes",evDel:"Delete this event",
+ evDelConfirm:function(n){return "Delete event \""+n+"\" and all its sales?";},
+ evOnlyOne:"You need at least one event.",evNew:"New event",evCurrent:"Current event",evAddH:"Add an event",
+ backupH:"Backup and export",
+ backupP:"Everything is saved in this browser only. Download a backup file now and then, especially before clearing your browser data or switching phones.",
+ expJson:"Download backup (.json)",expCsv:"Download sales (.csv)",impJson:"Restore from backup (.json)",
+ impConfirm:"Restoring replaces everything currently in this tool. Continue?",
+ impOk:"Backup restored.",impBad:"That file is not a valid backup.",
+ noStore:"Your browser blocked saving, so data will be lost when you close this page. Download a backup before you leave.",
+ csvHead:["Event","Date","Time","Product","Price","Payment","Quantity"],
+ pay:{cash:"cash",card:"card"},
+ printed:"Printed from the Craft Fair Tracker by Busy Bee Studio",
+ firstEvent:"My first event",
+ metaTitle:"Free Craft Fair Inventory & Sales Tracker | Busy Bee Studio",
+ metaDesc:"Free craft fair inventory and sales tracker. Tap to record booth sales, see stock left, print a packing list and end-of-day summary. Works offline."
+},
+es:{
+ title:"Control de inventario y ventas para ferias",
+ sub:"Cuenta tu mercancía, toca para anotar cada venta en tu puesto y mira cómo va el día. Gratis y sin conexión.",
+ event:"Evento",lang:"English",
+ tabs:{sell:"Vender",products:"Productos",restock:"Reponer",packing:"Lista de empaque",summary:"Resumen",events:"Eventos",data:"Copia de seguridad"},
+ made:"Hecho por Busy Bee Studio. Tus datos se quedan en este navegador.",
+ link:"¿Necesitas etiquetas de precio para tu puesto? Prueba nuestro Creador de etiquetas de precio gratis",
+ total:"Total de ventas",items:"Artículos vendidos",cash:"Efectivo",card:"Tarjeta",
+ payHow:"Pagó con",payCash:"Efectivo",payCard:"Tarjeta",
+ left:"quedan",soldOut:"Agotado",lowTag:"poco",
+ undo:"Deshacer última venta",nothingUndo:"Todavía no hay ventas que deshacer.",lastSale:"Última venta",
+ sold:function(n,p,m){return "Vendido: "+n+" ("+p+", "+m+")";},
+ undone:function(n){return "Deshecho: "+n;},
+ noProducts:"Aún no hay productos. Agrega el primero en la pestaña Productos.",
+ addProduct:"Agregar un producto",pName:"Nombre",pPrice:"Precio",pMade:"Cantidad hecha",pPacked:"Empacada para este evento",
+ add:"Agregar producto",del:"Eliminar",delConfirm:function(n){return "¿Eliminar \""+n+"\"? Las ventas anteriores se conservan en tus totales.";},
+ currency:"Símbolo de moneda",
+ invalid:"Escribe un nombre y un precio de 0 o más.",
+ added:function(n){return "Agregado: "+n;},
+ lowLabel:"Número de poco inventario (reponer cuando queden esta cantidad o menos)",
+ restockH:"Lista para reponer",restockNone:"No hay nada que reponer. Todo está por encima del número mínimo.",
+ colItem:"Artículo",colLeft:"Quedan",colPacked:"Empacadas",colSold:"Vendidas",colRev:"Ingresos",colPrice:"Precio",colPack:"¿Empacado?",
+ atHome:"En casa",
+ packH:"Lista de empaque",packNote:"Marca cada artículo al meterlo en la caja.",print:"Imprimir",
+ sumH:"Resumen del día",printSum:"Imprimir resumen",
+ cashTotal:"Total en efectivo",cardTotal:"Total con tarjeta",salesCount:"Ventas anotadas",
+ evH:"Eventos",evName:"Nombre del evento",evDate:"Fecha",evAdd:"Agregar evento",evSave:"Guardar cambios",evDel:"Eliminar este evento",
+ evDelConfirm:function(n){return "¿Eliminar el evento \""+n+"\" y todas sus ventas?";},
+ evOnlyOne:"Debe quedar al menos un evento.",evNew:"Evento nuevo",evCurrent:"Evento actual",evAddH:"Agregar un evento",
+ backupH:"Copia de seguridad y exportación",
+ backupP:"Todo se guarda solo en este navegador. Descarga una copia de vez en cuando, sobre todo antes de borrar los datos del navegador o cambiar de teléfono.",
+ expJson:"Descargar copia (.json)",expCsv:"Descargar ventas (.csv)",impJson:"Restaurar desde copia (.json)",
+ impConfirm:"Al restaurar se reemplaza todo lo que hay ahora en esta herramienta. ¿Continuar?",
+ impOk:"Copia restaurada.",impBad:"Ese archivo no es una copia válida.",
+ noStore:"Tu navegador bloqueó el guardado, así que los datos se perderán al cerrar esta página. Descarga una copia antes de irte.",
+ csvHead:["Evento","Fecha","Hora","Producto","Precio","Pago","Cantidad"],
+ pay:{cash:"efectivo",card:"tarjeta"},
+ printed:"Impreso desde el Control de ferias de Busy Bee Studio",
+ firstEvent:"Mi primer evento",
+ metaTitle:"Control de inventario y ventas para ferias gratis",
+ metaDesc:"Control gratis de inventario y ventas para ferias. Anota ventas con un toque, mira lo que queda e imprime tu lista de empaque y el resumen del día."
+}};
+
+var KEY="busybee_craft_fair_tracker_v1";
+var data,lang="en",tab="sell",pay="cash",storeOK=true,focusKey=null,msgTimer=null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function t(){return T[lang];}
+function $(id){return document.getElementById(id);}
+function h(tag,attrs,kids){var e=document.createElement(tag);if(attrs)for(var k in attrs){var v=attrs[k];if(v===false||v==null)continue;if(k==="text")e.textContent=v;else if(k.indexOf("on")===0)e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?"":v);}
+ (kids||[]).forEach(function(c){if(c==null)return;e.appendChild(typeof c==="string"?document.createTextNode(c):c);});return e;}
+
+function fresh(){var id=uid();return {v:1,lang:null,low:3,sym:"$",cur:id,products:[],events:[{id:id,name:"",date:today(),sales:[],packed:{}}]};}
+function load(){
+ var raw=null;
+ try{raw=localStorage.getItem(KEY);}catch(e){storeOK=false;}
+ var d=null;
+ if(raw){try{d=JSON.parse(raw);}catch(e){d=null;}}
+ data=valid(d)?d:fresh();
+ if(!valid(d)&&raw===null){/* new */}
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){if(storeOK){storeOK=false;}}
+}
+function valid(d){
+ if(!d||typeof d!=="object"||!Array.isArray(d.products)||!Array.isArray(d.events)||!d.events.length)return false;
+ for(var i=0;i<d.products.length;i++){var p=d.products[i];if(!p||typeof p.id!=="string"||typeof p.name!=="string"||!isFinite(p.price)||!isFinite(p.made))return false;}
+ for(var j=0;j<d.events.length;j++){var e=d.events[j];if(!e||typeof e.id!=="string"||!Array.isArray(e.sales)||typeof e.name!=="string")return false;
+  for(var k=0;k<e.sales.length;k++){var s=e.sales[k];if(!s||!isFinite(s.price)||!isFinite(s.qty)||(s.method!=="cash"&&s.method!=="card"))return false;}
+  if(!e.packed||typeof e.packed!=="object")e.packed={};}
+ if(!d.events.some(function(e){return e.id===d.cur;}))d.cur=d.events[0].id;
+ if(!isFinite(d.low))d.low=3;
+ if(typeof d.sym!=="string")d.sym="$";
+ return true;
+}
+function ev(){return data.events.filter(function(e){return e.id===data.cur;})[0];}
+function evName(e){return e.name||t().firstEvent;}
+function packedOf(e,p){var v=e.packed[p.id];return v==null?p.made:v;}
+function soldOf(e,pid){var n=0;e.sales.forEach(function(s){if(s.pid===pid)n+=s.qty;});return n;}
+function leftOf(e,p){return packedOf(e,p)-soldOf(e,p.id);}
+function nf(){return new Intl.NumberFormat(lang==="es"?"es":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function money(c){return data.sym+nf().format(c/100);}
+function cents(s){s=String(s).trim().replace(",",".");if(s==="")return NaN;var n=parseFloat(s);return isFinite(n)&&n>=0?Math.round(n*100):NaN;}
+function wholeNum(s){var n=parseInt(s,10);return isFinite(n)&&n>=0?n:0;}
+function totals(e){var r={cash:0,card:0,items:0,count:0};e.sales.forEach(function(s){var a=s.price*s.qty;r[s.method]+=a;r.items+=s.qty;r.count++;});r.total=r.cash+r.card;return r;}
+function say(m){var el=$("msg");el.textContent="";clearTimeout(msgTimer);setTimeout(function(){el.textContent=m;},20);msgTimer=setTimeout(function(){el.textContent="";},5000);}
+
+/* ---------- render ---------- */
+function renderChrome(){
+ var L=t();
+ document.documentElement.lang=lang;
+ document.title=L.metaTitle;
+ var md=document.querySelector('meta[name=description]');md.setAttribute("content",L.metaDesc);
+ $("t-h1").textContent=L.title;$("t-sub").textContent=L.sub;$("l-event").textContent=L.event;
+ $("langbtn").textContent=L.lang;
+ $("f-made").textContent=L.made;$("f-link").textContent=L.link;
+ var sel=$("evsel");sel.textContent="";
+ data.events.forEach(function(e){var o=h("option",{value:e.id,text:evName(e)+(e.date?" ("+e.date+")":"")});if(e.id===data.cur)o.selected=true;sel.appendChild(o);});
+ var nav=$("tabs");nav.textContent="";
+ Object.keys(L.tabs).forEach(function(k){
+  nav.appendChild(h("button",{type:"button","data-tab":k,"aria-current":k===tab?"page":false,text:L.tabs[k],onclick:function(){tab=k;render();window.scrollTo(0,0);}}));
+ });
+}
+function showPanel(){["sell","products","restock","packing","summary","events","data"].forEach(function(k){$("p-"+k).hidden=(k!==tab);});}
+
+function stats(e){
+ var L=t(),r=totals(e);
+ function st(l,v,id){return h("div",{class:"stat"},[h("b",{text:v,id:id}),h("span",{text:l})]);}
+ return h("div",{class:"stats"},[st(L.total,money(r.total),"s-total"),st(L.items,String(r.items),"s-items"),st(L.cash,money(r.cash),"s-cash"),st(L.card,money(r.card),"s-card")]);
+}
+function renderSell(){
+ var L=t(),e=ev(),p=$("p-sell");p.textContent="";
+ p.appendChild(stats(e));
+ var fs=h("fieldset",{class:"pay"},[h("legend",{text:L.payHow})]);
+ [["cash",L.payCash],["card",L.payCard]].forEach(function(o){
+  var inp=h("input",{type:"radio",name:"pay",value:o[0],id:"pay-"+o[0],onchange:function(){pay=o[0];}});
+  if(pay===o[0])inp.checked=true;
+  fs.appendChild(h("label",{},[inp,h("span",{text:o[1]})]));
+ });
+ p.appendChild(fs);
+ if(!data.products.length){p.appendChild(h("p",{class:"empty",text:L.noProducts}));}
+ var g=h("div",{class:"grid"});
+ data.products.forEach(function(pr){
+  var left=leftOf(e,pr);
+  var b=h("button",{type:"button",class:"sell"+(left>0&&left<=data.low?" low":""),"data-pid":pr.id,disabled:left<=0,onclick:function(){sell(pr.id);}},[
+   h("span",{class:"n",text:pr.name}),h("span",{class:"p",text:money(pr.price)}),
+   h("span",{class:"l",text:left<=0?L.soldOut:left+" "+L.left})]);
+  g.appendChild(b);
+ });
+ p.appendChild(g);
+ var last=e.sales[e.sales.length-1];
+ var u=h("div",{class:"undo"},[
+  h("button",{type:"button",id:"undo",disabled:!last,onclick:undo,text:L.undo}),
+  h("span",{class:"small",id:"lastsale",text:last?L.lastSale+": "+last.name+" ("+money(last.price*last.qty)+", "+L.pay[last.method]+")":L.nothingUndo})]);
+ p.appendChild(u);
+}
+function sell(pid){
+ var e=ev(),pr=data.products.filter(function(x){return x.id===pid;})[0];
+ if(!pr||leftOf(e,pr)<=0)return;
+ e.sales.push({id:uid(),pid:pid,name:pr.name,price:pr.price,qty:1,method:pay,ts:new Date().toISOString()});
+ focusKey="sell:"+pid;save();render();
+ say(t().sold(pr.name,money(pr.price),t().pay[pay]));
+}
+function undo(){
+ var e=ev();var s=e.sales.pop();if(!s)return;
+ focusKey="undo";save();render();say(t().undone(s.name));
+}
+
+function renderProducts(){
+ var L=t(),e=ev(),p=$("p-products");p.textContent="";
+ p.appendChild(h("h2",{text:L.addProduct}));
+ var f=h("form",{id:"addform",class:"prow",novalidate:true,onsubmit:function(ev2){
+  ev2.preventDefault();
+  var n=$("a-name").value.trim(),c=cents($("a-price").value),m=wholeNum($("a-made").value);
+  if(!n||isNaN(c)){say(t().invalid);$("a-name").focus();return;}
+  data.products.push({id:uid(),name:n,price:c,made:m});
+  save();focusKey="a-name";render();say(t().added(n));
+ }},[
+  h("div",{class:"full"},[h("label",{for:"a-name",text:L.pName}),h("input",{type:"text",id:"a-name",autocomplete:"off",maxlength:"80"})]),
+  h("div",{},[h("label",{for:"a-price",text:L.pPrice}),h("input",{type:"text",inputmode:"decimal",id:"a-price",autocomplete:"off"})]),
+  h("div",{},[h("label",{for:"a-made",text:L.pMade}),h("input",{type:"number",min:"0",step:"1",inputmode:"numeric",id:"a-made",value:"10"})]),
+  h("div",{class:"full"},[h("button",{type:"submit",class:"primary",text:L.add,id:"a-add"})])
+ ]);
+ p.appendChild(f);
+ var cur=h("div",{style:"max-width:220px;margin:8px 0"},[h("label",{for:"sym",text:L.currency}),h("input",{type:"text",id:"sym",maxlength:"4",value:data.sym,onchange:function(){data.sym=this.value;save();render();}})]);
+ p.appendChild(cur);
+ data.products.forEach(function(pr,i){
+  var id="r"+i;
+  function upd(fn){return function(){fn(this);save();focusKey=this.id;render();};}
+  var row=h("div",{class:"prow","data-row":pr.id},[
+   h("div",{class:"full"},[h("label",{for:id+"n",text:L.pName}),h("input",{type:"text",id:id+"n",maxlength:"80",value:pr.name,onchange:upd(function(x){var v=x.value.trim();if(v)pr.name=v;})})]),
+   h("div",{},[h("label",{for:id+"p",text:L.pPrice}),h("input",{type:"text",inputmode:"decimal",id:id+"p",value:(pr.price/100).toFixed(2),onchange:upd(function(x){var c=cents(x.value);if(!isNaN(c))pr.price=c;})})]),
+   h("div",{},[h("label",{for:id+"m",text:L.pMade}),h("input",{type:"number",min:"0",step:"1",id:id+"m",value:String(pr.made),onchange:upd(function(x){pr.made=wholeNum(x.value);})})]),
+   h("div",{},[h("label",{for:id+"k",text:L.pPacked}),h("input",{type:"number",min:"0",step:"1",id:id+"k",value:String(packedOf(e,pr)),onchange:upd(function(x){e.packed[pr.id]=wholeNum(x.value);})})]),
+   h("div",{class:"full"},[h("button",{type:"button",class:"danger",text:L.del,"aria-label":L.del+": "+pr.name,onclick:function(){
+     if(confirm(L.delConfirm(pr.name))){data.products.splice(i,1);save();render();}}})])
+  ]);
+  p.appendChild(row);
+ });
+}
+
+function tableFor(cols,rows,foot){
+ var thead=h("thead",{},[h("tr",{},cols.map(function(c){return h("th",{scope:"col",class:c.num?"num":false,text:c.label});}))]);
+ var tb=h("tbody",{},rows.map(function(r){return h("tr",{},r.map(function(v,i){var cell=h("td",{class:cols[i].num?"num":false});if(v instanceof Node)cell.appendChild(v);else cell.textContent=v;return cell;}));}));
+ var tbl=h("table",{},[thead,tb]);
+ if(foot)tbl.appendChild(h("tfoot",{},[h("tr",{},foot.map(function(v,i){return h("td",{class:cols[i].num?"num":false,text:v});}))]));
+ return tbl;
+}
+function renderRestock(){
+ var L=t(),e=ev(),p=$("p-restock");p.textContent="";
+ p.appendChild(h("h2",{text:L.restockH}));
+ p.appendChild(h("div",{style:"max-width:360px;margin-bottom:12px"},[h("label",{for:"low",text:L.lowLabel}),h("input",{type:"number",min:"0",step:"1",id:"low",value:String(data.low),onchange:function(){data.low=wholeNum(this.value);save();focusKey="low";render();}})]));
+ var rows=data.products.filter(function(pr){return leftOf(e,pr)<=data.low;}).map(function(pr){
+  var l=leftOf(e,pr);return [pr.name,String(Math.max(l,0)),String(Math.max(pr.made-packedOf(e,pr),0))];});
+ if(!rows.length)p.appendChild(h("p",{class:"empty",id:"restock-none",text:L.restockNone}));
+ else p.appendChild(h("div",{id:"restock-table"},[tableFor([{label:L.colItem},{label:L.colLeft,num:1},{label:L.atHome,num:1}],rows)]));
+}
+function printHead(e,title){
+ return h("div",{},[h("h2",{text:title}),h("p",{text:evName(e)+(e.date?" - "+e.date:"")})]);
+}
+function renderPacking(){
+ var L=t(),e=ev(),p=$("p-packing");p.textContent="";
+ p.appendChild(printHead(e,L.packH));
+ p.appendChild(h("p",{class:"small noprint",text:L.packNote}));
+ var rows=data.products.map(function(pr){return [h("span",{class:"box","aria-hidden":"true"}),pr.name,String(packedOf(e,pr)),money(pr.price)];});
+ if(rows.length)p.appendChild(tableFor([{label:L.colPack},{label:L.colItem},{label:L.colPacked,num:1},{label:L.colPrice,num:1}],rows));
+ else p.appendChild(h("p",{class:"empty",text:L.noProducts}));
+ p.appendChild(h("div",{class:"btns noprint"},[h("button",{type:"button",class:"primary",id:"print-pack",text:L.print,onclick:function(){doPrint("packing");}})]));
+ p.appendChild(h("p",{class:"printonly small",text:L.printed}));
+}
+function renderSummary(){
+ var L=t(),e=ev(),p=$("p-summary");p.textContent="";
+ p.appendChild(printHead(e,L.sumH));
+ var r=totals(e);
+ var rows=data.products.map(function(pr){var s=soldOf(e,pr.id),rev=0;e.sales.forEach(function(x){if(x.pid===pr.id)rev+=x.price*x.qty;});return [pr.name,String(s),money(rev),String(leftOf(e,pr))];});
+ // sales of deleted products
+ var known={};data.products.forEach(function(pr){known[pr.id]=1;});
+ var gone={};e.sales.forEach(function(s){if(!known[s.pid]){var g=gone[s.pid]||(gone[s.pid]={n:s.name,q:0,r:0});g.q+=s.qty;g.r+=s.price*s.qty;}});
+ Object.keys(gone).forEach(function(k){rows.push([gone[k].n,String(gone[k].q),money(gone[k].r),"-"]);});
+ var cols=[{label:L.colItem},{label:L.colSold,num:1},{label:L.colRev,num:1},{label:L.colLeft,num:1}];
+ if(rows.length)p.appendChild(h("div",{id:"sum-table"},[tableFor(cols,rows,[L.total,String(r.items),money(r.total),""])]));
+ else p.appendChild(h("p",{class:"empty",text:L.noProducts}));
+ p.appendChild(h("div",{style:"margin-top:12px",id:"sum-pay"},[
+  h("p",{text:L.cashTotal+": "+money(r.cash)}),h("p",{text:L.cardTotal+": "+money(r.card)}),h("p",{text:L.salesCount+": "+r.count})]));
+ p.appendChild(h("div",{class:"btns noprint"},[h("button",{type:"button",class:"primary",id:"print-sum",text:L.printSum,onclick:function(){doPrint("summary");}})]));
+ p.appendChild(h("p",{class:"printonly small",text:L.printed}));
+}
+function doPrint(which){
+ document.body.setAttribute("data-print",which);
+ try{window.print();}catch(e){}
+}
+function renderEvents(){
+ var L=t(),e=ev(),p=$("p-events");p.textContent="";
+ p.appendChild(h("h2",{text:L.evCurrent}));
+ p.appendChild(h("form",{class:"prow",id:"editev",onsubmit:function(x){x.preventDefault();e.name=$("e-name").value.trim();e.date=$("e-date").value;save();focusKey="e-name";render();}},[
+  h("div",{class:"full"},[h("label",{for:"e-name",text:L.evName}),h("input",{type:"text",id:"e-name",maxlength:"80",value:e.name||L.firstEvent})]),
+  h("div",{},[h("label",{for:"e-date",text:L.evDate}),h("input",{type:"date",id:"e-date",value:e.date||""})]),
+  h("div",{},[h("button",{type:"submit",class:"primary",text:L.evSave,id:"e-save"})]),
+  h("div",{},[h("button",{type:"button",class:"danger",id:"e-del",text:L.evDel,onclick:function(){
+    if(data.events.length<2){say(L.evOnlyOne);return;}
+    if(confirm(L.evDelConfirm(evName(e)))){data.events=data.events.filter(function(x){return x.id!==e.id;});data.cur=data.events[0].id;save();render();}}})])
+ ]));
+ p.appendChild(h("h2",{text:L.evAddH,style:"margin-top:18px"}));
+ p.appendChild(h("form",{class:"prow",id:"addev",onsubmit:function(x){x.preventDefault();
+   var n=$("n-name").value.trim();if(!n){$("n-name").focus();return;}
+   var id=uid();data.events.push({id:id,name:n,date:$("n-date").value||today(),sales:[],packed:{}});data.cur=id;save();tab="sell";render();say(L.added(n));}},[
+  h("div",{class:"full"},[h("label",{for:"n-name",text:L.evName}),h("input",{type:"text",id:"n-name",maxlength:"80"})]),
+  h("div",{},[h("label",{for:"n-date",text:L.evDate}),h("input",{type:"date",id:"n-date",value:today()})]),
+  h("div",{},[h("button",{type:"submit",class:"primary",id:"n-add",text:L.evAdd})])
+ ]));
+}
+function csvCell(v){v=String(v);if(/^[=+\-@\t\r]/.test(v))v="'"+v;return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function buildCsv(){
+ var L=t(),lines=[L.csvHead.map(csvCell).join(",")];
+ data.events.forEach(function(e){e.sales.forEach(function(s){
+  var d=new Date(s.ts);var tm=isNaN(d)?"":String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+  lines.push([evName(e),e.date||"",tm,s.name,(s.price/100).toFixed(2),L.pay[s.method],s.qty].map(csvCell).join(","));});});
+ return "﻿"+lines.join("\r\n")+"\r\n";
+}
+function download(name,text,type){
+ var b=new Blob([text],{type:type}),u=URL.createObjectURL(b),a=document.createElement("a");
+ a.href=u;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);
+ setTimeout(function(){URL.revokeObjectURL(u);},1000);
+}
+function renderData(){
+ var L=t(),p=$("p-data");p.textContent="";
+ p.appendChild(h("h2",{text:L.backupH}));
+ p.appendChild(h("p",{text:L.backupP}));
+ if(!storeOK)p.appendChild(h("p",{class:"warn",id:"nostore",text:L.noStore}));
+ p.appendChild(h("div",{class:"btns"},[
+  h("button",{type:"button",class:"primary",id:"exp-json",text:L.expJson,onclick:function(){download("craft-fair-tracker-backup-"+today()+".json",JSON.stringify(data,null,1),"application/json");}}),
+  h("button",{type:"button",id:"exp-csv",text:L.expCsv,onclick:function(){download("craft-fair-sales-"+today()+".csv",buildCsv(),"text/csv;charset=utf-8");}})]));
+ p.appendChild(h("div",{style:"max-width:360px"},[h("label",{for:"imp",text:L.impJson}),h("input",{type:"file",id:"imp",accept:".json,application/json",onchange:function(){
+  var f=this.files&&this.files[0],inp=this;if(!f)return;
+  var r=new FileReader();r.onload=function(){
+   var d=null;try{d=JSON.parse(r.result);}catch(x){}
+   if(!valid(d)){say(L.impBad);inp.value="";return;}
+   if(!confirm(L.impConfirm)){inp.value="";return;}
+   data=d;save();render();say(L.impOk);};
+  r.readAsText(f);}})]));
+}
+function render(){
+ renderChrome();showPanel();
+ if(tab==="sell")renderSell();
+ else if(tab==="products")renderProducts();
+ else if(tab==="restock")renderRestock();
+ else if(tab==="packing")renderPacking();
+ else if(tab==="summary")renderSummary();
+ else if(tab==="events")renderEvents();
+ else renderData();
+ if(focusKey){
+  var el=null;
+  if(focusKey.indexOf("sell:")===0)el=document.querySelector('[data-pid="'+focusKey.slice(5)+'"]');
+  else el=$(focusKey);
+  if(el&&!el.disabled){el.focus();}else if(focusKey.indexOf("sell:")===0){var any=document.querySelector(".sell:not(:disabled)");if(any)any.focus();}
+  focusKey=null;
+ }
+}
+window.addEventListener("afterprint",function(){document.body.removeAttribute("data-print");});
+$("evsel").addEventListener("change",function(){data.cur=this.value;save();render();});
+$("langbtn").addEventListener("click",function(){lang=lang==="en"?"es":"en";data.lang=lang;save();render();});
+
+load();
+lang=(data.lang==="es"||data.lang==="en")?data.lang:((navigator.language||"en").toLowerCase().indexOf("es")===0?"es":"en");
+render();
+if(!storeOK)say(t().noStore);
+})();
+</script>
+</body>
+</html>
