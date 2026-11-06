@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Free Price Tag Maker for Craft Fairs & Markets</title>
-<meta name="description" content="Make printable price tags for your craft fair or market stall in minutes. Free, private, no sign-up. Works in English and Spanish. Print on Letter or A4.">
+<title>Free Printable Price Tags: Craft Fair Tag Maker</title>
+<meta name="description" content="Make free printable price tags for craft fairs, markets and yard sales. Type your prices, pick a design and print on Letter or A4. Private, no sign-up.">
 <style>
 :root{--navy:#13213f;--gold:#f5c84c;--cream:#fff4d6;--ink:#13213f;--muted:#4a5878;--line:#d9c98f;--white:#fff}
 *{box-sizing:border-box}
@@ -155,7 +155,7 @@ footer a{color:var(--gold)}
 <script>
 (function(){
 var T={
-en:{title:"Price Tag Maker",intro:"Type your products and prices, pick a size, and print cut-ready price tags for your craft fair, farmers market or stall. Works on Letter and A4 paper.",
+en:{title:"Printable Price Tag Maker",intro:"Make free printable price tags in minutes: type your products and prices, pick a size and design, and print cut-ready tags for your craft fair, farmers market or yard sale. Works on Letter and A4 paper, in English and Spanish.",
 privacy:"Everything stays in your browser; nothing is sent anywhere.",privacy_short:"Everything stays in your browser; nothing is sent anywhere.",
 h_setup:"1. Tag style",shop:"Shop name (optional)",cur:"Currency symbol",curpos:"Symbol position",before:"Before price ($5)",after:"After price (5 €)",
 size:"Tag size",sm:"Small (50 x 30 mm)",md:"Medium (70 x 40 mm)",lg:"Large (90 x 55 mm)",paper:"Paper",design:"Design",
@@ -193,7 +193,7 @@ function applyLang(){
  document.querySelectorAll("[data-i]").forEach(function(el){el.textContent=t(el.getAttribute("data-i"))});
  $("l-en").setAttribute("aria-pressed",lang==="en");$("l-es").setAttribute("aria-pressed",lang==="es");
  $("bulk").placeholder=lang==="es"?"Vela de soja, 14\nEnvoltorio de cera, 9.50, hecho a mano":"Soy candle, 14\nBeeswax wrap, 9.50, hand made";
- document.title=lang==="es"?"Creador gratis de etiquetas de precio para ferias":"Free Price Tag Maker for Craft Fairs & Markets";
+ document.title=lang==="es"?"Etiquetas de precio imprimibles gratis para ferias":"Free Printable Price Tags: Craft Fair Tag Maker";
  renderItems();render();
 }
 function save(){S.set("bbs_tags_v1",JSON.stringify({items:items,lang:lang,f:fields.reduce(function(o,k){o[k]=$(k).value;return o},{}),ss:$("showshop").checked}))}
