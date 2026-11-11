@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://busybeestudio.github.io/sitemap.xml
