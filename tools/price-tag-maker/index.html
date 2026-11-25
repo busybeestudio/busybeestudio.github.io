@@ -67,10 +67,13 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid v
 footer{background:var(--navy);color:var(--cream);margin-top:24px;padding:18px 0;font-size:.92rem}
 footer a{color:var(--gold)}
 .sr{position:absolute;left:-9999px}
+.proline{margin:10px 0 0;font-size:.92rem;color:var(--muted)}
+.proline[hidden]{display:none}
+.proline a{color:var(--navy);font-weight:700}
 @media print{
  @page{margin:0}
  body{background:#fff}
- header.top,.intro,.privacy,.editor,.pro,footer,.sheetbox-title,.noprint{display:none!important}
+ header.top,.intro,.privacy,.editor,.pro,.proline,footer,.sheetbox-title,.noprint{display:none!important}
  main.grid{display:block}.wrap{padding:0;max-width:none}
  .sheetbox{border:0;padding:0;background:none;overflow:visible}
  #sheet{box-shadow:none;margin:0;width:auto!important;min-height:0;padding:8mm;transform:none!important}
@@ -144,6 +147,7 @@ footer a{color:var(--gold)}
 <div>
 <h2 class="sheetbox-title" data-i="preview"></h2>
 <div class="sheetbox" id="box" role="region" aria-label="Preview"><div id="sheet"></div></div>
+<p class="proline" id="proline" hidden><span data-i="proline"></span> <a id="prolink" href="https://busybeestudios.gumroad.com/l/price-tag-maker-pro?utm_source=website&amp;utm_medium=tool&amp;utm_campaign=price-tag-maker-pro" target="_blank" rel="noopener" data-i="prolink"></a></p>
 </div>
 </main>
 </div>
@@ -200,7 +204,7 @@ print:"Print tags",sample:"Load example",printhint:"tags ready. In the print win
 preview:"Preview",name_ph:"Product name",price_ph:"0.00",note_ph:"Note (optional)",remove:"Remove product",
 pro_h:"Pro upgrade (one-time, via Gumroad)",pro1:"Upload your logo onto every tag",pro2:"8 designs: 4 new ones including kraft label and bold border",pro3:"Save and load named price lists as .json files",pro4:"Sale tags with the old price struck through and a percent-off badge",
 pro_note:"Price Tag Maker Pro is now available as a one-time $9 download. This free version keeps working as it is.",pro_link:"See Price Tag Maker Pro on Gumroad",cft_link:"Selling at a craft fair? Track your stock and sales with our free Craft Fair Tracker",
-empty:"Add a product to see your tags here.",home:"More from Busy Bee Studio",contact:"Contact",copies_of:"copies of"},
+empty:"Add a product to see your tags here.",home:"More from Busy Bee Studio",contact:"Contact",copies_of:"copies of",proline:"Want more? Pro adds your logo on every tag, sale tags with % off, SKU lines and saved price lists.",prolink:"See Price Tag Maker Pro"},
 es:{title:"Creador de etiquetas de precio",intro:"Escribe tus productos y precios, elige un tamaño e imprime etiquetas listas para recortar para tu feria de artesanía, mercadillo o puesto. Funciona con papel Carta y A4.",
 privacy:"Todo se queda en tu navegador; no se envía nada a ningún sitio.",privacy_short:"Todo se queda en tu navegador; no se envía nada a ningún sitio.",
 h_setup:"1. Estilo de etiqueta",shop:"Nombre de tu tienda (opcional)",cur:"Símbolo de moneda",curpos:"Posición del símbolo",before:"Antes del precio ($5)",after:"Después del precio (5 €)",
@@ -212,7 +216,7 @@ print:"Imprimir etiquetas",sample:"Cargar ejemplo",printhint:"etiquetas listas. 
 preview:"Vista previa",name_ph:"Nombre del producto",price_ph:"0.00",note_ph:"Nota (opcional)",remove:"Quitar producto",
 pro_h:"Mejora Pro (pago único, en Gumroad)",pro1:"Sube tu logotipo a todas las etiquetas",pro2:"8 diseños: 4 nuevos, incluidas etiqueta kraft y borde grueso",pro3:"Guarda y carga listas de precios con nombre como archivos .json",pro4:"Etiquetas de oferta con el precio anterior tachado y una insignia de descuento",
 pro_note:"Price Tag Maker Pro ya está disponible como descarga única de $9. Esta versión gratuita sigue funcionando igual.",pro_link:"Ver Price Tag Maker Pro en Gumroad",cft_link:"¿Vendes en una feria? Controla tu inventario y tus ventas con nuestro Control de ferias gratis",
-empty:"Añade un producto para ver tus etiquetas aquí.",home:"Más de Busy Bee Studio",contact:"Contacto",copies_of:"copias de"}
+empty:"Añade un producto para ver tus etiquetas aquí.",home:"Más de Busy Bee Studio",contact:"Contacto",copies_of:"copias de",proline:"¿Quieres más? Pro añade tu logotipo en cada etiqueta, etiquetas de oferta con % de descuento, líneas de SKU y listas de precios guardadas.",prolink:"Ver Price Tag Maker Pro"}
 };
 var lang="en",items=[],MAX=300;
 var $=function(id){return document.getElementById(id)};
@@ -292,6 +296,7 @@ function render(){
  });
  sheet.innerHTML=html||'<div class="empty">'+esc(t("empty"))+'</div>';
  $("count").textContent=n;
+ if(n>0)$("proline").hidden=false;
  $("print").disabled=n===0;$("print").style.opacity=n?1:.5;
  var st=document.getElementById("pagestyle");
  if(!st){st=document.createElement("style");st.id="pagestyle";document.head.appendChild(st)}
